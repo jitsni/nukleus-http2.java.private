@@ -255,8 +255,8 @@ public final class TargetOutputEstablishedStreamFactory
                     final HttpBeginExFW beginEx = extension.get(beginExRO::wrap);
                     beginEx.headers().forEach(mapHeader(hpackContext));
                 }
-
                 Http2HeadersFW http2HeadersRO = http2HeadersRW.build();
+                System.out.println("Writing response headers = "+http2HeadersRO + " " + target);
 
                 target.doData(targetId, http2HeadersRO.buffer(), http2HeadersRO.offset(), http2HeadersRO.limit());
 
@@ -292,6 +292,8 @@ public final class TargetOutputEstablishedStreamFactory
                                               .endStream()
                                               .payload(payload.buffer(), payload.offset(), payload.sizeof())
                                               .build();
+                System.out.println("Writing response data = "+http2Data);
+
                 target.doData(targetId, http2Data.buffer(), http2Data.offset(), http2Data.limit());
 
                 //target.doData(targetId, payload);

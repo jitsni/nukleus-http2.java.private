@@ -146,6 +146,7 @@ public final class SourceInputStreamFactory
             int index,
             int length)
         {
+            System.out.println("SourceInputStream received a message ");
             streamState.onMessage(msgTypeId, buffer, index, length);
         }
 
@@ -321,6 +322,7 @@ public final class SourceInputStreamFactory
 
         private int decodePreface(final DirectBuffer buffer, final int offset, final int limit)
         {
+System.out.println("JITU Decode Preface");
             prefaceRO.wrap(buffer, offset, limit);
             this.decoderState = this::decodeHttp2Frames;
             source.doWindow(sourceId, limit - offset);
@@ -349,6 +351,7 @@ public final class SourceInputStreamFactory
                 assert limit - nextOffset >= 3;
 
                 http2RO.wrap(buffer, nextOffset, limit);
+System.out.println("JITU="+http2RO);
                 switch (http2RO.type())
                 {
                     case DATA:
@@ -367,6 +370,8 @@ public final class SourceInputStreamFactory
                         // TODO avoid iterating over headers twice
                         Map<String, String> headersMap = new HashMap<>();
                         headersRO.forEach(handleHeaderField(hpackContext, headersMap));
+System.out.println("JITU="+headersMap);
+
                         final Optional<Route> optional = resolveTarget(sourceRef, headersMap);
                         final Route route = optional.get();
                         final Target newTarget = route.target();
@@ -387,6 +392,7 @@ public final class SourceInputStreamFactory
                     case RST_STREAM:
                         break;
                     case SETTINGS:
+                        System.out.println("Writing SETTINGS frame");
                         AtomicBuffer payload = new UnsafeBuffer(new byte[2048]);
                         Http2SettingsFW settings = settingsRW.wrap(payload, 0, 2048).ack().build();
                         //long newTargetId = dataRO.streamId();

@@ -129,6 +129,7 @@ public final class Source implements Nukleus
         int index,
         int length)
     {
+        System.out.println("Source:handleRead");
         frameRO.wrap(buffer, index, index + length);
 
         final long streamId = frameRO.streamId();
@@ -152,12 +153,16 @@ public final class Source implements Nukleus
         int index,
         int length)
     {
+        System.out.println("Source:handleUnrecognized");
+
         if (msgTypeId == BeginFW.TYPE_ID)
         {
             handleBegin(msgTypeId, buffer, index, length);
         }
         else
         {
+            System.out.println("Source:handleUnrecognized:doReset");
+
             frameRO.wrap(buffer, index, index + length);
 
             final long streamId = frameRO.streamId();
@@ -172,6 +177,7 @@ public final class Source implements Nukleus
         int index,
         int length)
     {
+        System.out.println("Source:handleBegin");
         beginRO.wrap(buffer, index, index + length);
         final long sourceId = beginRO.streamId();
         final long sourceRef = beginRO.referenceId();
@@ -220,24 +226,35 @@ public final class Source implements Nukleus
         final long sourceRef,
         final long correlationId)
     {
+        System.out.println("Source:resolve");
+
         RouteKind routeKind = null;
 
         if (sourceRef == 0L)
         {
+            System.out.println("1.Source:resolve = " + sourceRef);
+
             final Correlation correlation = lookupEstablished.apply(correlationId);
             if (correlation != null)
             {
+                System.out.println("2.Source:resolve = " + correlation);
+
                 routeKind = correlation.established();
             }
             else
             {
+                System.out.println("3.Source:resolve = " + correlation);
+
                 routeKind = null;
             }
         }
         else
         {
+            System.out.println("4.Source:resolve = " + sourceRef);
+
             routeKind = RouteKind.match(sourceRef);
         }
+System.out.println("5.Source:resolve = " + routeKind);
 
         return routeKind;
     }
